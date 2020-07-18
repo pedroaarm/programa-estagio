@@ -6,6 +6,7 @@ import java.lang.StackWalker.Option;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,9 +42,7 @@ public class LinhaService {
 		Linha newLinhaGenerated = linhaRepository.save(newlinha);
 		
 		return newLinhaGenerated;
-		
 		}catch(Exception e) {
-			System.err.println("error -> "+ e);
 			return null;
 		}
 			
@@ -56,10 +55,10 @@ public class LinhaService {
 		return linha;
 	}
 	
-
 	public  List<Linha> getAll(){
-		
-		return linhaRepository.findAll();
+		List<Linha> linhas = linhaRepository.findAll();
+		Hibernate.initialize(linhas);
+		return linhas;
 	}
 	
 	public Optional<Linha> update(Linha linha){
@@ -77,7 +76,6 @@ public class LinhaService {
 					return linhaRepository.save(record);
 				} );
 				}catch(Exception e) {
-					
 					return null;
 				}
 		
@@ -92,18 +90,11 @@ public class LinhaService {
 	}
 	
 
-	
 	public List<Linha> getLinhasPorParada(Long idParada){
-		//List<Parada_Linha> relationshipBetweenLinhasAndParadas = paradaLinhaRepository.findByLinha_id();
+		
 		List<Linha> linhasPorParada = linhaRepository.findAllById(paradaLinhaRepository.findByLinha_id(idParada));
 		
-		for (Linha linha : linhasPorParada) {
-			System.out.println(linha.toString());
-		}
-		
-		
 		return linhasPorParada;
-		
 	}
 	
 	

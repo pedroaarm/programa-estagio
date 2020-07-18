@@ -14,6 +14,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 
 
@@ -28,8 +30,9 @@ public class Linha {
 	
 	@Column(name = "name")
 	private String name;
+	
 
-	 @ManyToMany(fetch = FetchType.LAZY)
+	 @ManyToMany(fetch = FetchType.EAGER)
 	 @JoinTable(name="parada_linha",
 	 joinColumns = {@JoinColumn(name="linha_id")},
 	 inverseJoinColumns = {@JoinColumn(name="parada_id")})

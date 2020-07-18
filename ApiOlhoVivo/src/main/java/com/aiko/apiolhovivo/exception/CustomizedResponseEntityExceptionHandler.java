@@ -1,6 +1,7 @@
 package com.aiko.apiolhovivo.exception;
 
 import java.util.Date;
+import java.time.LocalDateTime;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +19,35 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 
   @ExceptionHandler(NotFoundException.class)
   public final ResponseEntity<ErrorDetails> handleUserNotFoundException(NotFoundException ex, WebRequest request) {
-    ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(),
-        request.getDescription(false));
+    ErrorDetails errorDetails = new ErrorDetails(
+    		HttpStatus.NOT_FOUND,
+    		ex.getMessage(),
+    		request.getDescription(false));
+    
     return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
   }
+  
+  @ExceptionHandler(InternalServerErrorException.class)
+  public final ResponseEntity<ErrorDetails> handleInternalServerErrorException(InternalServerErrorException ex, WebRequest request){
+	  ErrorDetails errorDetails = new ErrorDetails(
+			  HttpStatus.INTERNAL_SERVER_ERROR, 
+			  ex.getMessage(),
+			  request.getDescription(false));
+	  return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+  
+  @ExceptionHandler(BadRequestException.class)
+  public final ResponseEntity<ErrorDetails> handlerBadRequestException(BadRequestException ex, WebRequest request){
+	  ErrorDetails errorDetails = new ErrorDetails(
+			  HttpStatus.BAD_REQUEST, 
+			  ex.getMessage(),
+			  request.getDescription(false));
+	  return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+  }
+  
+ 
+  
+	  
+  
 }
 

@@ -1,4 +1,4 @@
-package com.aiko.apiolhovivo.controller.v1.parada;
+package com.aiko.apiolhovivo.controller.v1;
 
 
 import java.util.List;

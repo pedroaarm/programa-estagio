@@ -1,5 +1,5 @@
 
-package com.aiko.apiolhovivo.controller.v1.parada;
+package com.aiko.apiolhovivo.controller.v1;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.aiko.apiolhovivo.entities.Linha;
 import com.aiko.apiolhovivo.entities.Parada;
+import com.aiko.apiolhovivo.exception.BadRequestException;
 import com.aiko.apiolhovivo.exception.NotFoundException;
 import com.aiko.apiolhovivo.service.LinhaService;
 import com.aiko.apiolhovivo.util.ErroMensage;
@@ -35,65 +36,80 @@ public class LinhaController {
 	@Autowired
 	private LinhaService linhaService;
 	
-	@PostMapping("")
+	@PostMapping()
 	@ApiOperation(value = "Adiciona uma nova Linha")
 	public ResponseEntity<?> newLinha(@RequestBody Linha linha){
 		
+		if(linha.getName() ==null)
+			throw new BadRequestException("Campo nome é obrigatório");
+			
 		Linha createdLinha = linhaService.insertNewLinha(linha);
 		
-		return new ResponseEntity<Linha>(linhaService.insertNewLinha(linha), HttpStatus.CREATED);
-			
+		if(createdLinha == null)
+			throw new InternalError("Erro interno");
+		else
+		return new ResponseEntity<Linha>(HttpStatus.CREATED);		
 	}
 	
 	@GetMapping("/{id}")
+	@ApiOperation(value = "Busca uma linha a partir do id informado")
 	public ResponseEntity<?> returnSpecificLinha(@PathVariable("id") long id){
 		Optional<Linha> linha = linhaService.selectLinha(id);
 		if(!linha.isPresent())
-			throw new NotFoundException("id - "+id);
+			throw new NotFoundException("id Não encontrado "+id);
+		
 		return new ResponseEntity<Optional<Linha>>(linha, HttpStatus.OK);
 	}
 	
-	@GetMapping("/all")
-	public ResponseEntity<?> returnAll(){
+	@GetMapping()
+	@ApiOperation(value = "Rotorna todas as Linhas cadastradas")
+	public ResponseEntity<?> returnAllLinhas(){
+		List<Linha> linhas = linhaService.getAll();
 		
-		return new ResponseEntity<List<Linha>>(linhaService.getAll(),HttpStatus.OK);
+		for (Linha linha : linhas) {
+			System.out.println(linha.getId());
+		}
+		return new ResponseEntity<List<Linha>>(linhas,HttpStatus.OK);
 	}
 	
-	@PutMapping("/editar")
+	@PutMapping()
+	@ApiOperation(value = "Edita uma linha")
 	public ResponseEntity<?> updateLinha(@RequestBody Linha linha){
-		System.out.println(linha.getId()+" "+linha.getName());
+
+		if(linha.getId() == null) 
+			throw new BadRequestException("ID é obrigatório");
+		if(linha.getName() == "")
+			throw new BadRequestException("Campo nome não pode ser vazio");
+			
 		Optional<Linha> linhaUptadet = linhaService.update(linha); 
-		if(linhaUptadet.isEmpty())
-			return new ResponseEntity<ErroMensage>(new ErroMensage("Id não encontrado"), HttpStatus.BAD_REQUEST);
 		
+		if(linhaUptadet.isEmpty()) 
+			throw new NotFoundException("id Não encontrado "+linha.getId());
+			
 		return new ResponseEntity<Optional<Linha>>(linhaUptadet, HttpStatus.OK);
 	
 	}
 	
-	@DeleteMapping("delete/{id}")
-	public ResponseEntity<?> delete(@PathVariable Long id){
-		
-		if(id < 0)
-			return new ResponseEntity<ErroMensage>(new ErroMensage("ID inválido"), HttpStatus.BAD_REQUEST);
+	@DeleteMapping("{id}")
+	@ApiOperation(value = "Deleta uma linha pelo id")
+	public ResponseEntity<?> deleteLinha(@PathVariable Long id){
 		
 		boolean result = linhaService.delete(id);
 		
 		if(result == false)
-			return new ResponseEntity<ErroMensage>(new ErroMensage("ID não encontrado"), HttpStatus.OK);
+			throw new NotFoundException("id Não encontrado "+id);
 		else
-			return new ResponseEntity<SucessMensage>(new SucessMensage("Linha Deletada"), HttpStatus.OK);
-		
+			return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	@GetMapping("linhasporparada/{idParada}")
+	@GetMapping("parada/{idParada}")
+	@ApiOperation(value = "Retorna todas as linhas relacionadas a determinada parada")
 	ResponseEntity<?> linhasPorParada(@PathVariable Long idParada){
 		List<Linha> linhaPorParadaList = linhaService.getLinhasPorParada(idParada);
 		return new ResponseEntity<List<Linha>>(linhaPorParadaList, HttpStatus.OK);
-	}
-	
-	
-		
-	}
+	}	
+
+}
 
 
 

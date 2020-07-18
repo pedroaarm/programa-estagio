@@ -2,7 +2,6 @@ package com.aiko.apiolhovivo.util;
 
 import java.time.LocalDateTime;
 
-
 import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -14,10 +13,6 @@ public class ErrorDetails {
 	  private String message;
 	  private String details;
 
-
-
-
-
 	public ErrorDetails(HttpStatus httpstatus, String message, String details) {
 
 		this.httpstatus = httpstatus;
@@ -25,18 +20,13 @@ public class ErrorDetails {
 		this.details = details;
 	}
 
-
 	public HttpStatus getHttpstatus() {
 		return httpstatus;
 	}
 
-
 	public void setHttpstatus(HttpStatus httpstatus) {
 		this.httpstatus = httpstatus;
 	}
-
-
-
 
 	public LocalDateTime getTimestamp() {
 		return timestamp;
@@ -62,7 +52,5 @@ public class ErrorDetails {
 
 	public void setDetails(String details) {
 		this.details = details;
-	}
-	  
-	  
+	} 
 }

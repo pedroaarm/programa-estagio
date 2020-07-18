@@ -3,7 +3,6 @@ package com.aiko.apiolhovivo.controller.v1;
 import java.util.List;
 import java.util.Optional;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +19,6 @@ import com.aiko.apiolhovivo.entities.Veiculo;
 import com.aiko.apiolhovivo.exception.BadRequestException;
 import com.aiko.apiolhovivo.exception.NotFoundException;
 import com.aiko.apiolhovivo.service.VeiculoService;
-import com.aiko.apiolhovivo.util.ErroMensage;
-import com.aiko.apiolhovivo.util.SucessMensage;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -58,7 +55,7 @@ public class VeiculoController {
 		Veiculo veiculoUpdated = veiculoService.update(veiculo);
 		
 		if(veiculoUpdated == null)
-			return new ResponseEntity<ErroMensage>(new ErroMensage("Dados Invalidos"), HttpStatus.BAD_REQUEST);
+			throw new NotFoundException("Dados invalidos");
 		
 		return new ResponseEntity<Veiculo>(veiculoUpdated, HttpStatus.OK);
 	}
@@ -79,7 +76,7 @@ public class VeiculoController {
 		Boolean veiculoExcluded = veiculoService.delete(id);
 		
 		if(veiculoExcluded)
-			return new ResponseEntity<SucessMensage>(new SucessMensage("Veiculo Excluido"), HttpStatus.OK);
+			return new ResponseEntity<Boolean>(true, HttpStatus.OK);
 		else
 			throw new NotFoundException("id Não encontrado "+id);
 	}
@@ -89,10 +86,5 @@ public class VeiculoController {
 	public ResponseEntity<?> veiculosPorParada(@PathVariable Long idLinha){
 		List<Veiculo> veiculoPorParadaList = veiculoService.veiculoPorParada(idLinha);
 		return new ResponseEntity<List<Veiculo>>(veiculoPorParadaList, HttpStatus.OK);
-		
 	}
-	
-
-	
-
 }

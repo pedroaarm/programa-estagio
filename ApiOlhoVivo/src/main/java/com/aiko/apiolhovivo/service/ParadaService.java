@@ -1,14 +1,21 @@
 package com.aiko.apiolhovivo.service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.aiko.apiolhovivo.entities.Parada;
+import com.aiko.apiolhovivo.exception.BadRequestException;
 import com.aiko.apiolhovivo.repository.ParadaRepository;
+import com.aiko.apiolhovivo.util.CalculateDistanceBetweenCoordinates;
 import com.aiko.apiolhovivo.util.CoordinateValidation;
+import com.aiko.apiolhovivo.util.ParadaDistance;
 
 @Service
 public class ParadaService {
@@ -56,17 +63,46 @@ public class ParadaService {
 		return paradarepository.findAll();
 	}
 	
-	public List<Parada> nextParadas(Double latitude, Double longitude){
+	public List<ParadaDistance> nextParadas(Double latitude, Double longitude){
 		if(CoordinateValidation.validation(latitude, longitude) == false)
-			throw new IllegalArgumentException("Coordenadas inválida");
-		
-	
-		return null;
+			throw new BadRequestException("Coordenadas inválida");
+				
+		return createListOfParadaDistance(
+				calculateDistance(paradarepository.findAll(), latitude, longitude),
+				latitude, 
+				longitude);
 	}
 	
 	
-}
+	private List<Parada> calculateDistance(List<Parada> allParada, Double latitude, Double longitude) {
+				
+		return allParada
+		.stream()
+		.filter(record -> CalculateDistanceBetweenCoordinates.calculate(latitude, longitude, 
+				record.getLatitude(), record.getLongitude())<500).collect(Collectors.toList());
+			
+	}
+	
+	private List<ParadaDistance> createListOfParadaDistance(List<Parada> paradas, Double latitude, Double longitude){
 
+		List<ParadaDistance> paradaDistance = new ArrayList<>();
+		for (Parada paradaDis : paradas) {
+			double distance = CalculateDistanceBetweenCoordinates.calculate(
+					latitude, 
+					longitude, 
+					paradaDis.getLatitude(), 
+					paradaDis.getLongitude());
+			
+	        BigDecimal distanceRoundTwoPlacesInBigDecimal = new BigDecimal(distance).setScale(2, RoundingMode.HALF_UP);
+			
+	        paradaDistance.add(new ParadaDistance(
+					paradaDis, 
+					distanceRoundTwoPlacesInBigDecimal.doubleValue()));
+		}
+		return paradaDistance;
+	}
+	
+}
 
 	
 

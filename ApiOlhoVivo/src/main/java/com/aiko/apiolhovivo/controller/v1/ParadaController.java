@@ -21,7 +21,7 @@ import com.aiko.apiolhovivo.exception.InternalServerErrorException;
 import com.aiko.apiolhovivo.exception.NotFoundException;
 import com.aiko.apiolhovivo.service.ParadaService;
 import com.aiko.apiolhovivo.util.CoordinateValidation;
-
+import com.aiko.apiolhovivo.util.ParadaDistance;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -100,12 +100,12 @@ public class ParadaController {
 		return new ResponseEntity<List<Parada>>(paradaservice.returnall(), HttpStatus.OK);
 	}
 	
-	/**
+	
 	@GetMapping("paradasproximas/{latitude}/{longitude}")
-	public ResponseEntity<?> returnnew (@PathVariable("latitude") Long latitude, @PathVariable("longitude") Long longitude){
-			List<Paradas> nextParadas = paradaservice.nextParadas(latitude, longitude);
-			return null;
+	public ResponseEntity<?> returnnew (@PathVariable("latitude") Double latitude, @PathVariable("longitude") Double longitude){
+			List<ParadaDistance> nextParadas = paradaservice.nextParadas(latitude, longitude);
+			return new ResponseEntity<List<ParadaDistance>>(nextParadas, HttpStatus.OK);
 	}
-	**/
+
 
 }

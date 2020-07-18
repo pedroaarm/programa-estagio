@@ -30,7 +30,7 @@ public class ParadaService {
 		return paradarepository.findById(id);
 	}
 	
-	public Optional<Parada> updateParada(Parada parada) {
+	public Optional<Parada> update(Parada parada) {
 		
 		return paradarepository.findById(parada.getId())
 							   .map(record -> {

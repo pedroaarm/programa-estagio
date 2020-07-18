@@ -17,12 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aiko.apiolhovivo.entities.Linha;
-import com.aiko.apiolhovivo.entities.Parada;
 import com.aiko.apiolhovivo.exception.BadRequestException;
 import com.aiko.apiolhovivo.exception.NotFoundException;
 import com.aiko.apiolhovivo.service.LinhaService;
-import com.aiko.apiolhovivo.util.ErroMensage;
-import com.aiko.apiolhovivo.util.SucessMensage;
+
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -65,10 +63,7 @@ public class LinhaController {
 	@ApiOperation(value = "Rotorna todas as Linhas cadastradas")
 	public ResponseEntity<?> returnAllLinhas(){
 		List<Linha> linhas = linhaService.getAll();
-		
-		for (Linha linha : linhas) {
-			System.out.println(linha.getId());
-		}
+
 		return new ResponseEntity<List<Linha>>(linhas,HttpStatus.OK);
 	}
 	

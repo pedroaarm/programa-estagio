@@ -16,10 +16,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.aiko.apiolhovivo.entities.Parada;
+import com.aiko.apiolhovivo.exception.BadRequestException;
+import com.aiko.apiolhovivo.exception.InternalServerErrorException;
+import com.aiko.apiolhovivo.exception.NotFoundException;
 import com.aiko.apiolhovivo.service.ParadaService;
 import com.aiko.apiolhovivo.util.CoordinateValidation;
-import com.aiko.apiolhovivo.util.ErroMensage;
-import com.aiko.apiolhovivo.util.SucessMensage;
+
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,63 +29,72 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 @RequestMapping("api/v1/parada")
 @Api(value = "parada")
-public class ParadaCRUD {
+public class ParadaController {
 	
 	@Autowired
 	private ParadaService paradaservice;
 	
 
+	@PostMapping()
+	@ApiOperation(value = "Adiciona uma nova Parada")
+	public ResponseEntity<?> newParada(@RequestBody Parada parada){
+		
+		boolean validCoordenades = CoordinateValidation.validation(parada.getLatitude(), parada.getLongitude());
+		if(validCoordenades == false) 
+			throw new BadRequestException("Coordenada(s) Inválida(s)");
+		
+		if(parada.getName() == null) 
+			throw new BadRequestException("Nome da Parada é obrigatório");
+		
+		Parada newParadaCreated = paradaservice.insert(parada);
+		
+		if(newParadaCreated == null) 
+			throw new InternalServerErrorException("Erro ao inserir, tente novamente");
+		
+		return new ResponseEntity<Parada>(newParadaCreated, HttpStatus.OK);
+	}
+	
+	
 	@GetMapping("/{id}")
 	@ApiOperation(value = "Retorna a parada relacionado ao id")
 	public ResponseEntity<?> returnSpecifcParada(@PathVariable("id") long id){
 
-		if(id < 0)
-			return new ResponseEntity<ErroMensage>(new ErroMensage("ID inválido"), HttpStatus.BAD_REQUEST);	
+
 		Optional<Parada> parada = paradaservice.findOneParada(id);
 
-		if(parada.isEmpty())
-			return new ResponseEntity<ErroMensage>(new ErroMensage("ID não encontrado"), HttpStatus.OK);	
-		else
-			return new ResponseEntity<Optional<Parada>>(parada,HttpStatus.OK);
+		if(!parada.isPresent())
+			throw new NotFoundException("id Não encontrado "+id);	
+		
+		return new ResponseEntity<Optional<Parada>>(parada,HttpStatus.OK);
 	}
 		
-	@PostMapping("adicionar")
-	public ResponseEntity<?> newParada(@RequestBody Parada parada){
-		
-		boolean validCoordenades = CoordinateValidation.validation(parada.getLatitude(), parada.getLongitude());
-		if(validCoordenades == false)
-			return new ResponseEntity<ErroMensage>(new ErroMensage("Latitude e/ou longitude em formado incorreto"), HttpStatus.BAD_REQUEST);
 
-		Parada newParadaCreated = paradaservice.insert(parada);
-
-		return new ResponseEntity<Parada>(newParadaCreated, HttpStatus.OK);
-	}
 	
-	@PutMapping("editar")
+	@PutMapping()
+	@ApiOperation(value = "Edita uma parada")
 	public ResponseEntity<?> updateParada(@RequestBody Parada parada){
 		
-		if(parada.getId() == 0)
-			return new ResponseEntity<ErroMensage>(new ErroMensage("ID é obrigatório"), HttpStatus.BAD_REQUEST);
+		Optional<Parada> paradaEdited = paradaservice.update(parada);
+		if(!paradaEdited.isPresent())
+			throw new NotFoundException("id Não encontrado "+parada.getId());	
 		
-		Optional<Parada> para = paradaservice.updateParada(parada);
-		return new ResponseEntity<Optional<Parada>>(para, HttpStatus.OK);
+		return new ResponseEntity<Optional<Parada>>(paradaEdited, HttpStatus.OK);
 	}
 	
-	@DeleteMapping("delete/{id}")
+	@DeleteMapping("{id}")
+	@ApiOperation(value = "Deleta uma parada pelo ID")
 	public ResponseEntity<?> deleteParada(@PathVariable("id") long id){
-		
-		if(id < 0)
-			return new ResponseEntity<ErroMensage>(new ErroMensage("ID inválido"), HttpStatus.BAD_REQUEST);
-		
+
 		boolean result = paradaservice.deleteParada(id);
 		
 		if(result == false)
-			return new ResponseEntity<ErroMensage>(new ErroMensage("ID não encontrado"), HttpStatus.OK);
+			throw new NotFoundException("id Não encontrado "+id);	
 		else
-			return new ResponseEntity<SucessMensage>(new SucessMensage("Parada Deletada"), HttpStatus.OK);
+			return new ResponseEntity<Boolean>(true,HttpStatus.OK);
 	}
 	
-	@GetMapping("/all")
+	@GetMapping()
+	@ApiOperation(value = "Retorna todos as paradas cadastradas")
 	public ResponseEntity<?> getAllParada(){
 		
 		return new ResponseEntity<List<Parada>>(paradaservice.returnall(), HttpStatus.OK);

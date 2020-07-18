@@ -19,37 +19,39 @@ import com.aiko.apiolhovivo.entities.PosicaoVeiculo;
 import com.aiko.apiolhovivo.exception.BadRequestException;
 import com.aiko.apiolhovivo.exception.NotFoundException;
 import com.aiko.apiolhovivo.service.PosicaoVeiculoService;
-import com.aiko.apiolhovivo.util.ErroMensage;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping("api/v1/posicaoveiculo")
+@Api(value = "Posição Veiculo")
 public class PosicaoVeiculoController {
 	
 	@Autowired
 	PosicaoVeiculoService posicaoVeiculoService;
 	
 	@PostMapping()
+	@ApiOperation(value = "Adiciona uma nova PosicaoVeiculo")
 	public ResponseEntity<?>NewPosicaoVeiculo(@RequestBody PosicaoVeiculo posicaoVeiculo){
 		
 		PosicaoVeiculo posicaoVeiculoCreated = posicaoVeiculoService.insert(posicaoVeiculo);
 		
 		if(posicaoVeiculoCreated == null) {
-			throw new BadRequestException("Coordenada(s) Inválida(s)");
+			throw new BadRequestException("Coordenada(s) Inválida(s) e/ou ID inválidos");
 		}
-		
-		return new ResponseEntity<PosicaoVeiculo>(posicaoVeiculo, HttpStatus.OK);
-		
+		return new ResponseEntity<PosicaoVeiculo>(posicaoVeiculo, HttpStatus.CREATED);	
 	}
 	
 	@GetMapping()
+	@ApiOperation(value = "Retorna todos as Posições Cadastradas")
 	public ResponseEntity<List<PosicaoVeiculo>> getAllPosicaoVeiculo(){
 		
 		return new ResponseEntity<List<PosicaoVeiculo>>(posicaoVeiculoService.getAll(), HttpStatus.OK);
 	}
 	
-	
 	@PutMapping()
+	@ApiOperation(value = "Edita uma PosicaoVeiculo")
 	public ResponseEntity<?>updatePosicaoVeiculo(@RequestBody PosicaoVeiculo posicaoVeiculo){
 		PosicaoVeiculo posicaoVeiculoUptadet = posicaoVeiculoService.update(posicaoVeiculo);
 		if(posicaoVeiculoUptadet == null)
@@ -59,7 +61,8 @@ public class PosicaoVeiculoController {
 	}
 	
 	@GetMapping("{id}")
-	public ResponseEntity<?> selectById(@PathVariable("id") Long id){
+	@ApiOperation(value = "Retorna a PosicaoVeiculo relacionado ao id")
+	public ResponseEntity<?> returnSpecificPosicaoVeiculo(@PathVariable("id") Long id){
 		Optional<PosicaoVeiculo> result = posicaoVeiculoService.selectById(id);
 
 		if(result.isEmpty())
@@ -69,13 +72,12 @@ public class PosicaoVeiculoController {
 	}
 	
 	@DeleteMapping("{id}")
+	@ApiOperation(value = "Deleta uma PosicaoVeiculo pelo ID")
 	public ResponseEntity<?> deletePosicaoVeiculo(@PathVariable("id") Long id){
 		boolean result = posicaoVeiculoService.delete(id);
 		
 		if(result == false)
 			throw new NotFoundException("id Não encontrado "+id);
-		return new ResponseEntity<Boolean>(true, HttpStatus.OK);
-		
+		return new ResponseEntity<Boolean>(true, HttpStatus.OK);	
 	}
-	
 }

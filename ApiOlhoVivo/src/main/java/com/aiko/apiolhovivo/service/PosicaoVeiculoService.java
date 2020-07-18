@@ -40,6 +40,7 @@ public class PosicaoVeiculoService {
 	 * @param posicaoVeiculo
 	 * @return Posicao do Veiculo atualizado
 	 */
+	
 	public PosicaoVeiculo update (PosicaoVeiculo posicaoVeiculo) {
 
 		if(individualValidationCoordinate(posicaoVeiculo) == false)

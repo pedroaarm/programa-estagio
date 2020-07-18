@@ -3,7 +3,6 @@ package com.aiko.apiolhovivo.controller.v1;
 import java.util.List;
 import java.util.Optional;
 
-import javax.websocket.server.PathParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,37 +17,44 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aiko.apiolhovivo.entities.Veiculo;
+import com.aiko.apiolhovivo.exception.BadRequestException;
+import com.aiko.apiolhovivo.exception.NotFoundException;
 import com.aiko.apiolhovivo.service.VeiculoService;
 import com.aiko.apiolhovivo.util.ErroMensage;
 import com.aiko.apiolhovivo.util.SucessMensage;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 @RestController
 @RequestMapping("api/v1/veiculo")
+@Api(value = "veiculo")
 public class VeiculoController {
 	
 	@Autowired
 	VeiculoService veiculoService;
 	
-	@PostMapping("adicionar")
+	@PostMapping()
+	@ApiOperation(value = "Adiciona um novo Veiculo")
 	public ResponseEntity<?> newVeiculo(@RequestBody Veiculo veiculo){
-		
-		System.out.println(veiculo.getName()+" "+veiculo.getLinhaId()+" "+veiculo.getModelo());
 		
 		Veiculo veiculoCreate = veiculoService.create(veiculo);
 		
 		if(veiculoCreate == null)
-			return new ResponseEntity<ErroMensage>(new ErroMensage("Dados Invalidos"), HttpStatus.BAD_REQUEST);
+			throw new BadRequestException("Dados Inválidos");
 		
 		return new ResponseEntity<Veiculo>(veiculoCreate, HttpStatus.OK);
 	}
 	
-	@GetMapping("/all")
-	public ResponseEntity<List<Veiculo>> getAll(){
+	@GetMapping()
+	@ApiOperation(value = "Retorna todos os Veiculos cadastrados")
+	public ResponseEntity<List<Veiculo>> getAllVeiculo(){
 		return new ResponseEntity<List<Veiculo>>(veiculoService.getAll(), HttpStatus.OK);
 	}
 	
-	@PutMapping("atualizar")
-	public ResponseEntity<?> update(@RequestBody Veiculo veiculo){
+	@PutMapping()
+	@ApiOperation(value = "Edita um veiculo")
+	public ResponseEntity<?> updateVeiculo(@RequestBody Veiculo veiculo){
 		Veiculo veiculoUpdated = veiculoService.update(veiculo);
 		
 		if(veiculoUpdated == null)
@@ -57,29 +63,31 @@ public class VeiculoController {
 		return new ResponseEntity<Veiculo>(veiculoUpdated, HttpStatus.OK);
 	}
 	
-	@GetMapping("/{id}")
+	@GetMapping("{id}")
+	@ApiOperation(value = "Retorna um relacionado ao id")
 	public ResponseEntity<?>selectById(@PathVariable Long id){
 		Optional<Veiculo> veiculo = veiculoService.selectById(id);
 		if(veiculo.isEmpty())
-			return new ResponseEntity<ErroMensage>(new ErroMensage("Veiculo não entrado"), HttpStatus.BAD_REQUEST);
+			throw new NotFoundException("id Não encontrado "+id);
 		
 		return new ResponseEntity<Optional<Veiculo>>(veiculo, HttpStatus.OK);
 	}
 	
-	@DeleteMapping("delete/{id}")
+	@DeleteMapping("{id}")
+	@ApiOperation(value = "Deleta uma Veiculo pelo ID")
 	public ResponseEntity<?>delete(@PathVariable Long id){
 		Boolean veiculoExcluded = veiculoService.delete(id);
 		
 		if(veiculoExcluded)
 			return new ResponseEntity<SucessMensage>(new SucessMensage("Veiculo Excluido"), HttpStatus.OK);
 		else
-			return new ResponseEntity<ErroMensage>(new ErroMensage("Id não encontrado"), HttpStatus.BAD_REQUEST);
+			throw new NotFoundException("id Não encontrado "+id);
 	}
 	
-	@GetMapping("veiculosporlinha/{idLinha}")
+	@GetMapping("linha/{idLinha}")
+	@ApiOperation(value = "Dado o ID de uma Linha, retorna todas as Paradas relacionadas a linha")
 	public ResponseEntity<?> veiculosPorParada(@PathVariable Long idLinha){
 		List<Veiculo> veiculoPorParadaList = veiculoService.veiculoPorParada(idLinha);
-		
 		return new ResponseEntity<List<Veiculo>>(veiculoPorParadaList, HttpStatus.OK);
 		
 	}

@@ -25,6 +25,14 @@ public class VeiculoService {
 		return veiculoRepository.save(veiculo);
 	}
 	
+	/**Recebe uma classe Veiculo e tenta fazer update a partir do ID passado
+	 * O Map verifica se o atributo do atributo passado são nulos, caso seja, ele manatem o mesmo 
+	 * presente no record
+	 * 
+	 * @param veiculo
+	 * @return newVeiculo
+	 */
+	
 	public Veiculo update(Veiculo veiculo) {
 		return veiculoRepository.findById(veiculo.getId())
 		.map(record -> {

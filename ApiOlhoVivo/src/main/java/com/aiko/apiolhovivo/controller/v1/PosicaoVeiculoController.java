@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aiko.apiolhovivo.entities.PosicaoVeiculo;
+import com.aiko.apiolhovivo.exception.BadRequestException;
+import com.aiko.apiolhovivo.exception.NotFoundException;
 import com.aiko.apiolhovivo.service.PosicaoVeiculoService;
 import com.aiko.apiolhovivo.util.ErroMensage;
 
@@ -27,32 +29,32 @@ public class PosicaoVeiculoController {
 	@Autowired
 	PosicaoVeiculoService posicaoVeiculoService;
 	
-	@PostMapping("/adicionar")
-	public ResponseEntity<?>createNewPosicaoVeiculo(@RequestBody PosicaoVeiculo posicaoVeiculo){
+	@PostMapping()
+	public ResponseEntity<?>NewPosicaoVeiculo(@RequestBody PosicaoVeiculo posicaoVeiculo){
 		
 		PosicaoVeiculo posicaoVeiculoCreated = posicaoVeiculoService.insert(posicaoVeiculo);
 		
 		if(posicaoVeiculoCreated == null) {
-			return new ResponseEntity<ErroMensage>(new ErroMensage("Latitude, longitude e/ou id em formado incorreto"), HttpStatus.BAD_REQUEST);
+			throw new BadRequestException("Coordenada(s) Inválida(s)");
 		}
 		
 		return new ResponseEntity<PosicaoVeiculo>(posicaoVeiculo, HttpStatus.OK);
 		
 	}
 	
-	@GetMapping("/all")
-	public ResponseEntity<List<PosicaoVeiculo>> getAll(){
+	@GetMapping()
+	public ResponseEntity<List<PosicaoVeiculo>> getAllPosicaoVeiculo(){
 		
 		return new ResponseEntity<List<PosicaoVeiculo>>(posicaoVeiculoService.getAll(), HttpStatus.OK);
 	}
 	
 	
-	@PutMapping("/atualizar")
+	@PutMapping()
 	public ResponseEntity<?>updatePosicaoVeiculo(@RequestBody PosicaoVeiculo posicaoVeiculo){
 		PosicaoVeiculo posicaoVeiculoUptadet = posicaoVeiculoService.update(posicaoVeiculo);
 		if(posicaoVeiculoUptadet == null)
-			return new ResponseEntity<ErroMensage>(new ErroMensage("Verificar os dados"), HttpStatus.BAD_REQUEST);
-		
+			throw new BadRequestException("Verificar Dados");
+
 		return new ResponseEntity<PosicaoVeiculo>(posicaoVeiculoUptadet, HttpStatus.OK);
 	}
 	
@@ -61,17 +63,17 @@ public class PosicaoVeiculoController {
 		Optional<PosicaoVeiculo> result = posicaoVeiculoService.selectById(id);
 
 		if(result.isEmpty())
-			return new ResponseEntity<ErroMensage>(new ErroMensage("Id não encontrado"), HttpStatus.BAD_REQUEST);
+			throw new NotFoundException("id Não encontrado "+id);
 		
 		return new ResponseEntity<Optional<PosicaoVeiculo>>(result, HttpStatus.OK);
 	}
 	
-	@DeleteMapping("/delete/{id}")
+	@DeleteMapping("{id}")
 	public ResponseEntity<?> deletePosicaoVeiculo(@PathVariable("id") Long id){
 		boolean result = posicaoVeiculoService.delete(id);
 		
 		if(result == false)
-			return new ResponseEntity<ErroMensage>(new ErroMensage("ID não encontrado"), HttpStatus.BAD_REQUEST);
+			throw new NotFoundException("id Não encontrado "+id);
 		return new ResponseEntity<Boolean>(true, HttpStatus.OK);
 		
 	}

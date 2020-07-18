@@ -22,9 +22,6 @@ public class PosicaoVeiculoService {
 
 	public PosicaoVeiculo insert(PosicaoVeiculo posicaoVeiculo) {
 		
-		System.out.println(posicaoVeiculo.toString());
-		
-		
 		if(doesItContainAllValidParameters(posicaoVeiculo) == false)
 			return null;
 		
@@ -35,6 +32,14 @@ public class PosicaoVeiculoService {
 		return posicaoVeiculoRepository.findAll();
 	}
 	
+	
+	/** Recebe uma classe PosicaoVeiculo e tenta fazer update a partir do ID passado
+	 * O Map verifica se o atributo do atributo passado são nulos, caso seja, ele manatem o mesmo 
+	 * presente no record
+	 * 
+	 * @param posicaoVeiculo
+	 * @return Posicao do Veiculo atualizado
+	 */
 	public PosicaoVeiculo update (PosicaoVeiculo posicaoVeiculo) {
 
 		if(individualValidationCoordinate(posicaoVeiculo) == false)
@@ -60,6 +65,13 @@ public class PosicaoVeiculoService {
 		return posicaoVeiculoRepository.findById(id);
 	}
 	
+	/**Veirifica se posicaoVeiculo tem todos os sseus parametros validos
+	 * 
+	 * @author Pedro Augusto
+	 * @param posicaoVeiculo
+	 * @return true caso tenha todos os dados validos, false caso contrario
+	 */
+	
 	private boolean doesItContainAllValidParameters(PosicaoVeiculo posicaoVeiculo) {
 		if(posicaoVeiculo.getLatitude() == null
 				|| posicaoVeiculo.getLongitude() == null
@@ -76,6 +88,12 @@ public class PosicaoVeiculoService {
 	}
 	
 	
+	/** Recebe PosicaoVeiculo e verifica se a latitude e longitude são válidas
+	 * 
+	 * @param posicaoVeiculo
+	 * @return
+	 */
+	
 	private boolean individualValidationCoordinate(PosicaoVeiculo posicaoVeiculo) {
 		if(posicaoVeiculo.getLatitude() != null) 
 			if(CoordinateValidation.validationLatitude(posicaoVeiculo.getLatitude()) == false)
@@ -85,11 +103,7 @@ public class PosicaoVeiculoService {
 			if(CoordinateValidation.validationLongitude(posicaoVeiculo.getLongitude()) == false)
 				return false;
 		
-		return true;
-			
+		return true;	
 	}
-	
-			
-			
-	}
+}
 

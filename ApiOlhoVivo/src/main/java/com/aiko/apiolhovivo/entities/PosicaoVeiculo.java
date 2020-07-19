@@ -78,14 +78,4 @@ public class PosicaoVeiculo {
 	public void setLongitude(Double longitude) {
 		this.longitude = longitude;
 	}
-
-
-
-	
-	
-	
-	
-	
-	
-	
 }

@@ -50,4 +50,12 @@ public class DefaultClientService implements ClientService {
         Optional<Client> customer= customerRepository.findById(id);
         return customer.orElse(null);
     }
+
+	@Override
+	public Optional<Client> findUsuario(String usuario) {
+		Optional<Client> customer = customerRepository.findUsuario(usuario);
+		Client client = new Client(customer.get().getUsuario(), customer.get().getSenha());
+		return Optional.of(client);
+	}
+	
 }

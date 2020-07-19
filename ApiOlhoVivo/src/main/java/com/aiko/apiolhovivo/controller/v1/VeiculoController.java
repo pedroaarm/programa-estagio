@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aiko.apiolhovivo.entities.Veiculo;
-import com.aiko.apiolhovivo.exception.BadRequestException;
 import com.aiko.apiolhovivo.exception.NotFoundException;
 import com.aiko.apiolhovivo.service.VeiculoService;
 
@@ -35,25 +34,21 @@ public class VeiculoController {
 	@ApiOperation(value = "Adiciona um novo Veiculo")
 	public ResponseEntity<?> newVeiculo(@RequestBody Veiculo veiculo){
 		
-		Veiculo veiculoCreate = veiculoService.create(veiculo);
-		
-		if(veiculoCreate == null)
-			throw new BadRequestException("Dados Inválidos");
-		
-		return new ResponseEntity<Veiculo>(veiculoCreate, HttpStatus.OK);
+		return new ResponseEntity<Veiculo>(veiculoService.create(veiculo), HttpStatus.OK);
 	}
 	
 	@GetMapping()
 	@ApiOperation(value = "Retorna todos os Veiculos cadastrados")
 	public ResponseEntity<List<Veiculo>> getAllVeiculo(){
+		
 		return new ResponseEntity<List<Veiculo>>(veiculoService.getAll(), HttpStatus.OK);
 	}
 	
 	@PutMapping()
 	@ApiOperation(value = "Edita um veiculo")
 	public ResponseEntity<?> updateVeiculo(@RequestBody Veiculo veiculo){
-		Veiculo veiculoUpdated = veiculoService.update(veiculo);
 		
+		Veiculo veiculoUpdated = veiculoService.update(veiculo);
 		if(veiculoUpdated == null)
 			throw new NotFoundException("Dados invalidos");
 		
@@ -63,18 +58,15 @@ public class VeiculoController {
 	@GetMapping("{id}")
 	@ApiOperation(value = "Retorna um relacionado ao id")
 	public ResponseEntity<?>selectById(@PathVariable Long id){
-		Optional<Veiculo> veiculo = veiculoService.selectById(id);
-		if(veiculo.isEmpty())
-			throw new NotFoundException("id Não encontrado "+id);
 		
-		return new ResponseEntity<Optional<Veiculo>>(veiculo, HttpStatus.OK);
+		return new ResponseEntity<Optional<Veiculo>>(veiculoService.selectById(id), HttpStatus.OK);
 	}
 	
 	@DeleteMapping("{id}")
 	@ApiOperation(value = "Deleta uma Veiculo pelo ID")
 	public ResponseEntity<?>delete(@PathVariable Long id){
-		Boolean veiculoExcluded = veiculoService.delete(id);
 		
+		Boolean veiculoExcluded = veiculoService.delete(id);
 		if(veiculoExcluded)
 			return new ResponseEntity<Boolean>(true, HttpStatus.OK);
 		else
@@ -82,9 +74,9 @@ public class VeiculoController {
 	}
 	
 	@GetMapping("linha/{idLinha}")
-	@ApiOperation(value = "Dado o ID de uma Linha, retorna todas as Paradas relacionadas a linha")
+	@ApiOperation(value = "Dado o ID de uma Linha, retorna todas os veiculos relacionadas a linha")
 	public ResponseEntity<?> veiculosPorParada(@PathVariable Long idLinha){
-		List<Veiculo> veiculoPorParadaList = veiculoService.veiculoPorParada(idLinha);
-		return new ResponseEntity<List<Veiculo>>(veiculoPorParadaList, HttpStatus.OK);
+
+		return new ResponseEntity<List<Veiculo>>(veiculoService.veiculoPorParada(idLinha), HttpStatus.OK);
 	}
 }

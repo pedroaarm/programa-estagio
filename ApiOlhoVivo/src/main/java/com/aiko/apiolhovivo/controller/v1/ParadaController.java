@@ -16,11 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.aiko.apiolhovivo.entities.Parada;
-import com.aiko.apiolhovivo.exception.BadRequestException;
-import com.aiko.apiolhovivo.exception.InternalServerErrorException;
 import com.aiko.apiolhovivo.exception.NotFoundException;
 import com.aiko.apiolhovivo.service.ParadaService;
-import com.aiko.apiolhovivo.util.CoordinateValidation;
 import com.aiko.apiolhovivo.util.ParadaDistance;
 
 import io.swagger.annotations.Api;
@@ -38,38 +35,22 @@ public class ParadaController {
 	@PostMapping()
 	@ApiOperation(value = "Adiciona uma nova Parada")
 	public ResponseEntity<?> newParada(@RequestBody Parada parada){
-		
-		boolean validCoordenades = CoordinateValidation.validation(parada.getLatitude(), parada.getLongitude());
-		if(validCoordenades == false) 
-			throw new BadRequestException("Coordenada(s) Inválida(s)");
-		
-		if(parada.getName() == null) 
-			throw new BadRequestException("Nome da Parada é obrigatório");
-		
 		Parada newParadaCreated = paradaservice.insert(parada);
-		
-		if(newParadaCreated == null) 
-			throw new InternalServerErrorException("Erro ao inserir, tente novamente");
 		
 		return new ResponseEntity<Parada>(newParadaCreated, HttpStatus.OK);
 	}
-	
 	
 	@GetMapping("/{id}")
 	@ApiOperation(value = "Retorna a parada relacionado ao id")
 	public ResponseEntity<?> returnSpecifcParada(@PathVariable("id") long id){
 
-
 		Optional<Parada> parada = paradaservice.findOneParada(id);
-
 		if(!parada.isPresent())
 			throw new NotFoundException("id Não encontrado "+id);	
 		
 		return new ResponseEntity<Optional<Parada>>(parada,HttpStatus.OK);
 	}
 		
-
-	
 	@PutMapping()
 	@ApiOperation(value = "Edita uma parada")
 	public ResponseEntity<?> updateParada(@RequestBody Parada parada){
@@ -86,7 +67,6 @@ public class ParadaController {
 	public ResponseEntity<?> deleteParada(@PathVariable("id") long id){
 
 		boolean result = paradaservice.deleteParada(id);
-		
 		if(result == false)
 			throw new NotFoundException("id Não encontrado "+id);	
 		else
@@ -100,9 +80,10 @@ public class ParadaController {
 		return new ResponseEntity<List<Parada>>(paradaservice.returnall(), HttpStatus.OK);
 	}
 	
-	@GetMapping("paradasproximas/{latitude}/{longitude}")
-	public ResponseEntity<?> returnnew (@PathVariable("latitude") Double latitude, @PathVariable("longitude") Double longitude){
-			List<ParadaDistance> nextParadas = paradaservice.nextParadas(latitude, longitude);
+	@GetMapping("proximas/{latitude}/{longitude}/{numberOfElements}")
+	public ResponseEntity<?> returnnew (@PathVariable("latitude") Double latitude, @PathVariable("longitude") Double longitude,
+			@PathVariable("numberOfElements") Long numberOfElements){
+			List<ParadaDistance> nextParadas = paradaservice.nextParadas(latitude, longitude, numberOfElements);
 			return new ResponseEntity<List<ParadaDistance>>(nextParadas, HttpStatus.OK);
 	}
 }

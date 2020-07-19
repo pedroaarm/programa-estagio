@@ -7,9 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.aiko.apiolhovivo.entities.PosicaoVeiculo;
+import com.aiko.apiolhovivo.exception.BadRequestException;
+import com.aiko.apiolhovivo.exception.InternalServerErrorException;
+import com.aiko.apiolhovivo.exception.NotFoundException;
 import com.aiko.apiolhovivo.repository.PosicaoVeiculoRepository;
 import com.aiko.apiolhovivo.repository.VeiculoRepository;
 import com.aiko.apiolhovivo.util.CoordinateValidation;
+
 
 @Service
 public class PosicaoVeiculoService {
@@ -21,11 +25,15 @@ public class PosicaoVeiculoService {
 	VeiculoRepository veiculoRepository;
 
 	public PosicaoVeiculo insert(PosicaoVeiculo posicaoVeiculo) {
-		
+		try {
 		if(doesItContainAllValidParameters(posicaoVeiculo) == false)
-			return null;
-		
+			throw new BadRequestException("Parametros inválidos");
+				
 		return posicaoVeiculoRepository.save(posicaoVeiculo);
+		}catch(Exception e) {
+			System.err.println(e);
+			throw new InternalServerErrorException("Erro interno");
+		}
 	}
 	
 	public List<PosicaoVeiculo> getAll(){
@@ -42,9 +50,9 @@ public class PosicaoVeiculoService {
 	 */
 	
 	public PosicaoVeiculo update (PosicaoVeiculo posicaoVeiculo) {
-
+		try {
 		if(individualValidationCoordinate(posicaoVeiculo) == false)
-			return null;
+			throw new BadRequestException("Coordenada(s) inválidas");
 		
 		return posicaoVeiculoRepository.findById(posicaoVeiculo.getVeiculoId())
 				.map(record -> {
@@ -52,6 +60,10 @@ public class PosicaoVeiculoService {
 					record.setLongitude(posicaoVeiculo.getLongitude() == null? record.getLongitude() : posicaoVeiculo.getLongitude());
 					return posicaoVeiculoRepository.save(record);
 				}).orElse(null);
+		}catch(Exception e) {
+			System.err.println(e);
+			throw new InternalServerErrorException("Erro interno");
+		}
 	}
 	
 	public boolean delete(Long id) {
@@ -63,7 +75,11 @@ public class PosicaoVeiculoService {
 	}
 	
 	public Optional<PosicaoVeiculo> selectById(Long id) {
-		return posicaoVeiculoRepository.findById(id);
+		Optional<PosicaoVeiculo> result = posicaoVeiculoRepository.findById(id);
+		if(result.isEmpty())
+			throw new NotFoundException("id Não encontrado "+id);
+		
+		return result;
 	}
 	
 	/**Veirifica se posicaoVeiculo tem todos os sseus parametros validos
@@ -103,7 +119,6 @@ public class PosicaoVeiculoService {
 		if(posicaoVeiculo.getLongitude() != null) 
 			if(CoordinateValidation.validationLongitude(posicaoVeiculo.getLongitude()) == false)
 				return false;
-		
 		return true;	
 	}
 }

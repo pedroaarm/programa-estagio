@@ -7,20 +7,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.aiko.apiolhovivo.entities.Veiculo;
-import com.aiko.apiolhovivo.repository.ParadaRepository;
+import com.aiko.apiolhovivo.exception.BadRequestException;
+import com.aiko.apiolhovivo.exception.NotFoundException;
+import com.aiko.apiolhovivo.repository.LinhaRespository;
 import com.aiko.apiolhovivo.repository.VeiculoRepository;
 
 @Service
 public class VeiculoService {
 	
 	@Autowired
-	VeiculoRepository veiculoRepository;
+	private VeiculoRepository veiculoRepository;
 	
-	@Autowired ParadaRepository paradaRepository;
+	@Autowired 
+	private LinhaRespository linhaRepository;
 	
 	public Veiculo create(Veiculo veiculo){
+		
 		if(!validateVeiculo(veiculo))
-			return null;
+			throw new BadRequestException("Insira todos os cados válidos");
 		
 		return veiculoRepository.save(veiculo);
 	}
@@ -34,13 +38,16 @@ public class VeiculoService {
 	 */
 	
 	public Veiculo update(Veiculo veiculo) {
+		
+		if(veiculo.getLinhaId()!=null && linhaRepository.existsById(veiculo.getLinhaId())==false) {
+			throw new BadRequestException("ID da linha inválido: "+veiculo.getLinhaId());
+		}
 		return veiculoRepository.findById(veiculo.getId())
 		.map(record -> {
-			if(veiculo.getLinhaId()!=null) {
-				record.setLinhaId(paradaRepository.existsById(veiculo.getLinhaId())? veiculo.getLinhaId() : record.getLinhaId());
-			}
 			record.setModelo(veiculo.getModelo()==null? record.getModelo() : veiculo.getModelo());
 			record.setName(veiculo.getName()==null? record.getName() : veiculo.getName());
+			record.setLinhaId(veiculo.getLinhaId()==null? record.getLinhaId() : veiculo.getLinhaId());
+			
 			return veiculoRepository.save(record);
 		}).orElse(null);
 	}
@@ -59,22 +66,22 @@ public class VeiculoService {
 	}
 	
 	public Optional<Veiculo> selectById(Long id) {
-		return veiculoRepository.findById(id);
+		Optional<Veiculo> veiculo = veiculoRepository.findById(id);
+		if(veiculo.isEmpty())
+			throw new NotFoundException("id Não encontrado "+id);
+		
+		return veiculo;
 	}
 	
 	
 	private boolean validateVeiculo(Veiculo veiculo) {
-		if(veiculo.getName().isEmpty() || veiculo.getModelo().isEmpty()) {
+		if(veiculo.getName() == null || veiculo.getModelo() == null) 
 			return false;
-		}else {
-			return paradaRepository.existsById(veiculo.getLinhaId());
-			
-		}
+		else
+			return linhaRepository.existsById(veiculo.getLinhaId());	
 	}
 	
 	public List<Veiculo> veiculoPorParada(Long idLinha) {
 		return veiculoRepository.findAllByLinhaId(idLinha);
 	}
-	
-
 }

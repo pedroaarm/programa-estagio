@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.aiko.apiolhovivo.entities.Linha;
+import com.aiko.apiolhovivo.entities.Parada;
+import com.aiko.apiolhovivo.exception.BadRequestException;
 import com.aiko.apiolhovivo.repository.LinhaRespository;
 import com.aiko.apiolhovivo.repository.ParadaRepository;
 import com.aiko.apiolhovivo.repository.Parada_LinhaRepository;
@@ -29,18 +31,24 @@ public class LinhaService {
 	
 	
 		//Verificar pq não está retornando as paradas
-	public Linha insertNewLinha (Linha newlinha) {
+	public Linha insertNewLinha (Linha newLinha) {
+		if(newLinha.getParadas() !=null)
+			if(VerifyIfExistParadasByID(newLinha.getParadas()) == false)
+				throw new BadRequestException("Parada Inexistente");
 		
-		try { 	
-		newlinha.getParadas()
-		.removeIf(parada ->  !paradaRepository.existsById(parada.getId()));
-		Linha newLinhaGenerated = linhaRepository.save(newlinha);
-		
+		Linha newLinhaGenerated = linhaRepository.save(newLinha);
 		return newLinhaGenerated;
-		}catch(Exception e) {
-			return null;
-		}	
 	}
+	
+	private boolean VerifyIfExistParadasByID(List<Parada> paradas) {
+
+		for (Parada parada : paradas)
+			if(paradaRepository.existsById(parada.getId()) == false)
+				return false;
+		
+		return true;
+	}
+	
 	
 	public Optional<Linha> selectLinha (Long id) {
 		Optional<Linha> linha = linhaRepository.findById(id);

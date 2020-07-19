@@ -12,5 +12,4 @@ public class InternalServerErrorException extends RuntimeException {
 		super(exception);
 	}
 	
-	
 }

@@ -46,7 +46,7 @@ public class LinhaController {
 		if(createdLinha == null)
 			throw new InternalError("Erro interno");
 		else
-		return new ResponseEntity<Linha>(HttpStatus.CREATED);		
+		return new ResponseEntity<>(linhaService.selectLinha(createdLinha.getId()),HttpStatus.CREATED);		
 	}
 	
 	@GetMapping("/{id}")
@@ -94,14 +94,14 @@ public class LinhaController {
 		if(result == false)
 			throw new NotFoundException("id Não encontrado "+id);
 		else
-			return new ResponseEntity<>(HttpStatus.OK);
+			return new ResponseEntity<>(result,HttpStatus.OK);
 	}
 	
 	@GetMapping("parada/{idParada}")
 	@ApiOperation(value = "Retorna todas as linhas relacionadas a determinada parada")
 	ResponseEntity<?> linhasPorParada(@PathVariable Long idParada){
-		List<Linha> linhaPorParadaList = linhaService.getLinhasPorParada(idParada);
-		return new ResponseEntity<List<Linha>>(linhaPorParadaList, HttpStatus.OK);
+		
+		return new ResponseEntity<List<Linha>>(linhaService.getLinhasPorParada(idParada), HttpStatus.OK);
 	}	
 
 }

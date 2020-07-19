@@ -6,6 +6,12 @@ import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+/**Classe para customizar os erros retornados nos Exceptions customizados
+ * 
+ * 
+ * @author pedro
+ *
+ */
 public class ErrorDetails {
 	 @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
 	  private LocalDateTime timestamp = LocalDateTime.now();

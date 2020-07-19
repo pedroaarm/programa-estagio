@@ -20,7 +20,7 @@ public class AuthenticationProvider extends AbstractUserDetailsAuthenticationPro
 
     @Override
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken) throws AuthenticationException {
-        //
+    	
     }
 
     @Override
@@ -31,6 +31,6 @@ public class AuthenticationProvider extends AbstractUserDetailsAuthenticationPro
                 .ofNullable(token)
                 .map(String::valueOf)
                 .flatMap(customerService::findByToken)
-                .orElseThrow(() -> new UsernameNotFoundException("Cannot find user with authentication token=" + token));
+                .orElseThrow(() -> new UsernameNotFoundException("Não foi possível encontrar o usuário com token de autenticação=" + token));
     }
 }

@@ -52,8 +52,4 @@ public class Parada_Linha {
 	public void setParada_id(Long parada_id) {
 		this.parada_id = parada_id;
 	}
-	
-	
-	
-
 }

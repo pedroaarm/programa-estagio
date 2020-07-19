@@ -7,9 +7,6 @@ public class ParadaDistance {
 	private Parada parada;
 	private Double distancia;
 	
-	
-	
-	
 	public ParadaDistance(Parada parada, Double distancia) {
 		super();
 		this.parada = parada;
@@ -28,8 +25,4 @@ public class ParadaDistance {
 		this.distancia = distancia;
 	}
 	
-	
-	
-	
-
 }

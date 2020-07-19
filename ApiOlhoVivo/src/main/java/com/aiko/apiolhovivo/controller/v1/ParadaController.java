@@ -100,12 +100,9 @@ public class ParadaController {
 		return new ResponseEntity<List<Parada>>(paradaservice.returnall(), HttpStatus.OK);
 	}
 	
-	
 	@GetMapping("paradasproximas/{latitude}/{longitude}")
 	public ResponseEntity<?> returnnew (@PathVariable("latitude") Double latitude, @PathVariable("longitude") Double longitude){
 			List<ParadaDistance> nextParadas = paradaservice.nextParadas(latitude, longitude);
 			return new ResponseEntity<List<ParadaDistance>>(nextParadas, HttpStatus.OK);
 	}
-
-
 }

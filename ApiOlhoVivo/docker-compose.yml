@@ -14,12 +14,12 @@ services:
     links:
       - db
   db:
-    image: mysql:5.6
+    image: mysql:5.7
     ports:
       - '3306:3306'
     environment:
-      - MYSQL_ROOT_HOST=aikoteste
-      - MYSQL_ROOT_PASSWORD=aikoteste
+      - MYSQL_ROOT_HOST=%
+      - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=olhoVivo
       - MYSQL_USER=aikoteste
       - MYSQL_PASSWORD=aikoteste

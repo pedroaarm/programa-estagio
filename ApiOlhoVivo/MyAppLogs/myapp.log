@@ -3156,3 +3156,7 @@ Caused by: java.lang.IllegalStateException: Multiple Dockets with the same group
 2020-07-20 09:50:01 [restartedMain] INFO  o.s.d.r.c.DeferredRepositoryInitializationListener - Spring Data repositories initialized!
 2020-07-20 09:50:01 [restartedMain] INFO  c.a.a.ApiOlhoVivoApplication - Started ApiOlhoVivoApplication in 1.95 seconds (JVM running for 2521.452)
 2020-07-20 09:50:01 [restartedMain] INFO  o.s.b.d.a.ConditionEvaluationDeltaLoggingListener - Condition evaluation unchanged
+2020-07-20 10:10:16 [SpringContextShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2020-07-20 10:10:23 [SpringContextShutdownHook] INFO  o.s.s.c.ThreadPoolTaskExecutor - Shutting down ExecutorService 'applicationTaskExecutor'
+2020-07-20 10:10:24 [SpringContextShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - SpringBootMysqlPool - Shutdown initiated...
+2020-07-20 10:10:25 [SpringContextShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - SpringBootMysqlPool - Shutdown completed.

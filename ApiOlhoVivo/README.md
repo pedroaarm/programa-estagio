@@ -9,8 +9,6 @@ Você poderá ver o video clicando nesse link [Link
 
  - Versão: 1.0
 
-v. 1.0
-
 ### Tools
 - Java 11
 - Spring Security

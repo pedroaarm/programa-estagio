@@ -1,0 +1,27 @@
+version: '3'
+services:
+  spring_boot_com_mysql:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    image: spring_boo_com_mysql/api
+    ports:
+      - '8000:8000'
+      - '5005:5005'
+    environment:
+      - ADDITIONAL_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Xmx1G -Xms128m -XX:MaxMetaspaceSize=128m
+      - PROFILE=dev
+    links:
+      - db
+  db:
+    image: mysql:5.6
+    ports:
+      - '3306:3306'
+    environment:
+      - MYSQL_ROOT_HOST=aikoteste
+      - MYSQL_ROOT_PASSWORD=aikoteste
+      - MYSQL_DATABASE=olhoVivo
+      - MYSQL_USER=aikoteste
+      - MYSQL_PASSWORD=aikoteste
+    volumes:
+      - ./docker/volume_mysql:/var/lib/mysql
